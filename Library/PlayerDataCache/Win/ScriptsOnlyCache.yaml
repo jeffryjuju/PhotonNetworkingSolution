@@ -877,7 +877,7 @@ ScriptsOnlyBuild:
     className: MultiplayerSettings
   - hash:
       serializedVersion: 2
-      Hash: 918dcaebd4f5f17d107064601ea7c59d
+      Hash: aaf68f201ca8e3ca5994ddd749fe0af0
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: LobbyManager
@@ -1129,7 +1129,7 @@ ScriptsOnlyBuild:
     className: SignalTrack
   - hash:
       serializedVersion: 2
-      Hash: 72e53227e700535df01c4d930e5831df
+      Hash: 95d0f3d678d2474cf42a8b9f5f3bf4d1
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: PhotonRoom

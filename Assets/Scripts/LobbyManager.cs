@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using Hastable = ExitGames.Client.Photon.Hashtable;
 
 /// <summary>
 /// Script for matchmaking and creating lobby.
@@ -13,14 +14,19 @@ public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
 {
     public static LobbyManager lobby;
 
+    [Header("Create Room")]
     public string playerName;
     public string roomName;
     public int roomSize;
+    public string roomDifficulty;
+
+    [Header("Joining Other Room")]
+    public string specificRoomName;
+
+    [Header("Panels")]
     public GameObject MainPanel;
     // public GameObject roomListingPrefab;
     // public Transform roomsPanel;
-    public TextMeshProUGUI roomNameText;
-    public TextMeshProUGUI roomSizeText;
 
     private void Awake()
     {
@@ -40,6 +46,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
         
         MainPanel.SetActive(true);
+        roomDifficulty = "easy";
     }
 
     /// <summary>
@@ -51,6 +58,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
             PhotonNetwork.NickName = "Player "+ Random.Range(0, 100);
         else
             PhotonNetwork.NickName = playerName;
+    }
+
+    /// <summary>
+    /// Joining a specific (private) match.
+    /// </summary>
+    public void JoinSpecificMatch()
+    {
+        SetPlayerName();
+        PhotonNetwork.JoinRoom(specificRoomName);
+        Debug.Log($"Joining {specificRoomName} room. Please wait...");
     }
 
     /// <summary>
@@ -70,23 +87,63 @@ public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
     /// <param name="message"></param>
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("Cannot find a room. No room available.");
-        // MakeRoom();
+        Debug.Log("Unable to join.");
     }
 
+    /// <summary>
+    /// Gets player's name input data.
+    /// </summary>
+    /// <param name="nameInput">Player's intended name.</param>
     public void OnPlayerNameChanged(string nameInput)
     {
         playerName = nameInput;
     }
 
+    /// <summary>
+    /// Gets room name input data to create a room.
+    /// </summary>
+    /// <param name="roomNameInput">Room's size</param>
     public void OnRoomNameChanged(string roomNameInput)
     {
         roomName = roomNameInput;
     }
 
+    /// <summary>
+    /// Gets room size input data.
+    /// </summary>
+    /// <param name="sizeInput"></param>
     public void OnRoomSizeChanged(string sizeInput)
     {
         roomSize = int.Parse(sizeInput);
+    }
+
+    /// <summary>
+    /// Gets specific room name input to join.
+    /// </summary>
+    /// <param name="roomNameInput"></param>
+    public void OnSpecificRoomNameChanged(string roomNameInput)
+    {
+        specificRoomName = roomNameInput;
+    }
+
+    /// <summary>
+    /// Sets difficulty level.
+    /// </summary>
+    /// <param name="difficultyOption"></param>
+    public void OnSetDifficultyChanged(int difficultyOption)
+    {
+        if (difficultyOption == 0)
+        {
+            roomDifficulty = "easy";
+        }
+        if (difficultyOption == 1)
+        {
+            roomDifficulty = "medium";
+        }
+        if (difficultyOption == 2)
+        {
+            roomDifficulty = "hard";
+        }
     }
 
     /// <summary>
@@ -101,10 +158,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
             IsOpen = true,
             MaxPlayers = (byte)roomSize
         };
+
+        // Custom Room Properties
+        Hastable RoomCustomProperties = new Hastable();
+        RoomCustomProperties.Add("difficulty", roomDifficulty);
+        roomOptions.CustomRoomProperties = RoomCustomProperties;
+
         PhotonNetwork.CreateRoom(roomName, roomOptions);
         Debug.Log($"Creating room {roomName} for {roomSize} person(s), awaiting other players.");
-        roomNameText.text = $"Room Name: {roomName}";
-        roomSizeText.text = $"Max Player: {roomSize}";
     }
 
 }

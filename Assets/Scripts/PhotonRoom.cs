@@ -31,15 +31,17 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     private float lessThanMaxPlayer;
     private float atMaxPlayer;
     private float timeToStart;
-    private string difficultyLevel;
 
-    public GameObject mainLobbyGameObject;
-    public GameObject roomGameObject;
+    [Header("UI")]
+    public GameObject mainLobbyPanel;
+    public GameObject roomPanel;
+    public GameObject joinRoomPanel;
     public Transform playersPanel;
     public GameObject playerListingPrefab;
     public GameObject startButton;
-    public GameObject difficultyOptions;
-    public GameObject difficultyGetter;
+    public TextMeshProUGUI roomNameText;
+    public TextMeshProUGUI roomSizeText;
+    public TextMeshProUGUI roomDifficultyText;
 
     private void Awake()
     {
@@ -121,24 +123,24 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
         base.OnJoinedRoom();
         Debug.Log("New player joined the room.");
 
-        mainLobbyGameObject.SetActive(false);
-        roomGameObject.SetActive(true);
+        mainLobbyPanel.SetActive(false);
+        joinRoomPanel.SetActive(false);
+        roomPanel.SetActive(true);
         if (PhotonNetwork.IsMasterClient)
         {
             startButton.SetActive(true);
-            difficultyOptions.SetActive(true);
         }
-        else
-        {
-            difficultyGetter.SetActive(true);
-        }
+        // Clears the listings then lists the new list of player
         ClearPlayerListings();
         ListPlayers();
 
         photonPlayers = PhotonNetwork.PlayerList;
         playersInRoom = photonPlayers.Length;
         myNumberInRoom = playersInRoom;
-        
+        roomNameText.text = $"Room Name: {PhotonNetwork.CurrentRoom.Name}";
+        roomSizeText.text = $"Max Player: {PhotonNetwork.CurrentRoom.MaxPlayers}";
+        roomDifficultyText.text = $"Difficulty: {PhotonNetwork.CurrentRoom.CustomProperties["difficulty"]}";
+
         if (MultiplayerSettings.multiplayerSettings.delayStart)
         {
             Debug.Log($"({playersInRoom}/{MultiplayerSettings.multiplayerSettings.maxPlayers}) person(s) in this room.");
@@ -154,10 +156,6 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 PhotonNetwork.CurrentRoom.IsOpen = false;
             }
         }
-        /*else
-        {
-            StartGame();
-        }*/
     }
 
     /// <summary>
@@ -296,8 +294,8 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
         if (PhotonNetwork.InRoom)
         {
             PhotonNetwork.LeaveRoom();
-            roomGameObject.SetActive(false);
-            mainLobbyGameObject.SetActive(true);
+            roomPanel.SetActive(false);
+            mainLobbyPanel.SetActive(true);
         }
     }
 }

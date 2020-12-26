@@ -18,6 +18,7 @@ public class PhotonManager : MonoBehaviour
 
     public void DisconnectPlayer()
     {
+        Destroy(PhotonRoom.room.gameObject);
         StartCoroutine(DisconnectAndLoad());
     }
 
