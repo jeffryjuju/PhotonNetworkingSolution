@@ -2,27 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// In-game player spawning mechanic.
+/// </summary>
 public class PhotonManager : MonoBehaviour
 {
-    [SerializeField]
-    GameObject[] SpawnPoints;
+    
 
     void Start()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            SpawnPlayer();
-        }
+        
     }
 
-    void SpawnPlayer()
+    public void DisconnectPlayer()
     {
-        int player = 0;
-        if (!PhotonNetwork.IsMasterClient)
+        StartCoroutine(DisconnectAndLoad());
+    }
+
+    IEnumerator DisconnectAndLoad()
+    {
+        PhotonNetwork.Disconnect();
+        while (PhotonNetwork.IsConnected)
         {
-            player = 1;
+            yield return null;
         }
-        GameObject Player = PhotonNetwork.Instantiate("Player", SpawnPoints[player].transform.position, Quaternion.identity);
+        SceneManager.LoadScene(0);
     }
 }

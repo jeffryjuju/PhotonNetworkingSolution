@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
+/// <summary>
+/// Script to disable controller of another player.
+/// </summary>
 public class ComponentsToDisable : MonoBehaviourPun
 {
     [SerializeField]

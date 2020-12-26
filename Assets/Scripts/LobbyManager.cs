@@ -4,13 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
-public class LobbyManager : MonoBehaviourPunCallbacks
+/// <summary>
+/// Script for matchmaking and creating lobby.
+/// </summary>
+public class LobbyManager : MonoBehaviourPunCallbacks, ILobbyCallbacks
 {
-    [SerializeField]
-    GameObject findMatchButton;
-    [SerializeField]
-    GameObject searchingPanel;
+    public static LobbyManager lobby;
+
+    public string playerName;
+    public string roomName;
+    public int roomSize;
+    public GameObject MainPanel;
+    // public GameObject roomListingPrefab;
+    // public Transform roomsPanel;
+    public TextMeshProUGUI roomNameText;
+    public TextMeshProUGUI roomSizeText;
+
+    private void Awake()
+    {
+        lobby = this; // Creates the singleton
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -21,54 +36,75 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log($"We are connected to Photon on {PhotonNetwork.CloudRegion} server");
+        Debug.Log($"You are connected to Photon on {PhotonNetwork.CloudRegion} server");
         PhotonNetwork.AutomaticallySyncScene = true;
-        findMatchButton.SetActive(true);
+        
+        MainPanel.SetActive(true);
     }
 
-    public void FindMatch()
+    /// <summary>
+    /// Sets player name.
+    /// </summary>
+    void SetPlayerName()
     {
-        searchingPanel.SetActive(true);
-        findMatchButton.SetActive(false);
+        if (playerName == null)
+            PhotonNetwork.NickName = "Player "+ Random.Range(0, 100);
+        else
+            PhotonNetwork.NickName = playerName;
+    }
 
+    /// <summary>
+    /// Random matchmaking logic.
+    /// </summary>
+    public void JoinRandomMatch()
+    {
+        SetPlayerName();
         PhotonNetwork.JoinRandomRoom();
         Debug.Log("Finding match...");
     }
 
+    /// <summary>
+    /// Executed whenever player unable to find random room.
+    /// </summary>
+    /// <param name="returnCode"></param>
+    /// <param name="message"></param>
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("Cannot find a room. Creating a room.");
-        MakeRoom();
+        Debug.Log("Cannot find a room. No room available.");
+        // MakeRoom();
     }
 
-    void MakeRoom()
+    public void OnPlayerNameChanged(string nameInput)
     {
-        int randomRoomName = Random.Range(0, 5000);
+        playerName = nameInput;
+    }
+
+    public void OnRoomNameChanged(string roomNameInput)
+    {
+        roomName = roomNameInput;
+    }
+
+    public void OnRoomSizeChanged(string sizeInput)
+    {
+        roomSize = int.Parse(sizeInput);
+    }
+
+    /// <summary>
+    /// Creating a new room for matchmaking.
+    /// </summary>
+    public void CreateRoom()
+    {
+        SetPlayerName();
         RoomOptions roomOptions = new RoomOptions()
         {
             IsVisible = true,
             IsOpen = true,
-            MaxPlayers = 2
+            MaxPlayers = (byte)roomSize
         };
-        PhotonNetwork.CreateRoom("RoomName_" + randomRoomName, roomOptions);
-        Debug.Log("Room created, awaiting other players.");
+        PhotonNetwork.CreateRoom(roomName, roomOptions);
+        Debug.Log($"Creating room {roomName} for {roomSize} person(s), awaiting other players.");
+        roomNameText.text = $"Room Name: {roomName}";
+        roomSizeText.text = $"Max Player: {roomSize}";
     }
 
-    public void StopSearch()
-    {
-        searchingPanel.SetActive(false);
-        findMatchButton.SetActive(true);
-        PhotonNetwork.LeaveRoom();
-        Debug.Log("Stopped finding match. Back to Main Menu.");
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
-        {
-            Debug.Log($"{PhotonNetwork.CurrentRoom.PlayerCount}/2 players joined. Starting the game");
-            // Start the game
-            PhotonNetwork.LoadLevel(1);
-        }
-    }
 }

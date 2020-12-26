@@ -304,9 +304,10 @@
     <Compile Include="Assets\Photon\Simple\Utilities\SmartVars\SmartVars.cs" />
     <Compile Include="Assets\Scripts\ComponentsToDisable.cs" />
     <Compile Include="Assets\Scripts\LobbyManager.cs" />
+    <Compile Include="Assets\Scripts\MultiplayerSettings.cs" />
     <Compile Include="Assets\Scripts\PhotonManager.cs" />
+    <Compile Include="Assets\Scripts\PhotonRoom.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\PreparePool.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
     <None Include="Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.xml" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
