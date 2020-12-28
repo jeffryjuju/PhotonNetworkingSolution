@@ -222,10 +222,11 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
         isGameLoaded = true;
         if (!PhotonNetwork.IsMasterClient)
             return;
-        if (MultiplayerSettings.multiplayerSettings.delayStart)
-        {
-            PhotonNetwork.CurrentRoom.IsOpen = false;
-        }
+        //if (MultiplayerSettings.multiplayerSettings.delayStart)
+        //{
+        //    PhotonNetwork.CurrentRoom.IsOpen = false;
+        //}
+        PhotonNetwork.CurrentRoom.IsOpen = false;
 
         PhotonNetwork.LoadLevel(MultiplayerSettings.multiplayerSettings.multiplayerScene);
     }
@@ -282,8 +283,11 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
         base.OnPlayerLeftRoom(otherPlayer);
         Debug.Log($"{otherPlayer.NickName} has left the game.");
         playersInRoom--;
-        ClearPlayerListings();
-        ListPlayers();
+        if (isGameLoaded == false)
+        {
+            ClearPlayerListings();
+            ListPlayers();
+        }
     }
 
     /// <summary>
